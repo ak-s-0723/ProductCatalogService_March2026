@@ -2,9 +2,12 @@ package org.example.productcatalogservice_march2026.controllers;
 
 import org.example.productcatalogservice_march2026.dtos.CategoryDto;
 import org.example.productcatalogservice_march2026.dtos.ProductDto;
+import org.example.productcatalogservice_march2026.models.Category;
 import org.example.productcatalogservice_march2026.models.Product;
 import org.example.productcatalogservice_march2026.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired
@@ -23,7 +27,7 @@ public class ProductController {
 
 //  GET /products
 
-    @GetMapping("/products")
+    @GetMapping
     public List<Product> getAllProducts() {
         Product product1 = new Product();
         product1.setId(1L);
@@ -33,15 +37,34 @@ public class ProductController {
         return products;
     }
 
-    @GetMapping("/products/{id}")
-    public ProductDto getProductById(@PathVariable("id") Long productId) {
+    @GetMapping("{id}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
+        if(productId <= 0) {
+            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Please pass productId > 0");
+        }
+
        Product product = productService.getProductById(productId);
-       return from(product);
+       if (product != null) {
+           ProductDto productDto = from(product);
+           return new ResponseEntity<>(productDto, HttpStatus.OK);
+       } else {
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
     }
 
-    @PostMapping("/products")
+
+    @PostMapping
     public ProductDto createProduct(@RequestBody  ProductDto input) {
         return input;
+    }
+
+    @PutMapping("{id}")
+    public ProductDto replaceProduct(@PathVariable Long id,
+                                     @RequestBody ProductDto input)  {
+        Product inputProduct = from(input);
+        Product product = productService.replaceProduct(inputProduct,id);
+        return from(product);
     }
 
 
@@ -61,6 +84,22 @@ public class ProductController {
         }
 
         return productDto;
+    }
+
+    private Product from(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImageUrl());
+        product.setDescription(productDto.getDescription());
+        if(productDto.getCategory() != null) {
+            Category category = new Category();
+            category.setTitle(productDto.getCategory().getTitle());
+            category.setId(productDto.getCategory().getId());
+            product.setCategory(category);
+        }
+        return product;
     }
 
 }

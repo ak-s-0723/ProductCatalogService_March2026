@@ -6,6 +6,7 @@ import org.example.productcatalogservice_march2026.models.Category;
 import org.example.productcatalogservice_march2026.models.Product;
 import org.example.productcatalogservice_march2026.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,9 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
+    @Qualifier("storageProductService")
     private IProductService productService;
+
 
 //    public ProductController(IProductService productService) {
 //        this.productService = productService;
@@ -28,13 +31,14 @@ public class ProductController {
 //  GET /products
 
     @GetMapping
-    public List<Product> getAllProducts() {
-        Product product1 = new Product();
-        product1.setId(1L);
-        product1.setTitle("Iphone");
-        List<Product> products = new ArrayList<>();
-        products.add(product1);
-        return products;
+    public List<ProductDto> getAllProducts() {
+       List<Product> products = productService.getAllProducts();
+       List<ProductDto> response = new ArrayList<>();
+       for(Product product : products) {
+           ProductDto productDto = from(product);
+           response.add(productDto);
+       }
+       return response;
     }
 
     @GetMapping("{id}")
@@ -56,7 +60,9 @@ public class ProductController {
 
     @PostMapping
     public ProductDto createProduct(@RequestBody  ProductDto input) {
-        return input;
+        Product inputProduct = from(input);
+        Product output = productService.createProduct(inputProduct);
+        return from(output);
     }
 
     @PutMapping("{id}")
@@ -65,6 +71,12 @@ public class ProductController {
         Product inputProduct = from(input);
         Product product = productService.replaceProduct(inputProduct,id);
         return from(product);
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+
     }
 
 

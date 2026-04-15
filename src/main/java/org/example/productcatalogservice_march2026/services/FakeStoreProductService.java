@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
-public class ProductService implements IProductService {
+public class FakeStoreProductService implements IProductService {
 
     @Autowired
     private RestTemplateBuilder builder;
@@ -70,6 +70,11 @@ public class ProductService implements IProductService {
         }
 
         return null;
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+
     }
 
 

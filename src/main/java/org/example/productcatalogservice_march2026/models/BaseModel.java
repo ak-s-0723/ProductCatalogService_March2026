@@ -14,7 +14,6 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class BaseModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date createdAt;

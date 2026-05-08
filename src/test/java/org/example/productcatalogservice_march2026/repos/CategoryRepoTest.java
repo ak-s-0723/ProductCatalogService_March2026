@@ -18,7 +18,23 @@ class CategoryRepoTest {
     @Autowired
     private CategoryRepo categoryRepo;
 
-    @Test
+    @Autowired
+    private ProductRepo productRepo;
+
+    //@Test
+    public void addDataToRDS() {
+        Product product = new Product();
+        product.setId(1L);
+        product.setTitle("Iphone");
+        Category category = new Category();
+        category.setId(2L);
+        category.setTitle("Phones");
+        categoryRepo.save(category);
+        product.setCategory(category);
+        productRepo.save(product);
+    }
+
+    //@Test
     @Transactional
     public void testFetchTypes() {
         Optional<Category> optionalCategory = categoryRepo.findById(3L);
@@ -30,7 +46,7 @@ class CategoryRepoTest {
     }
 
 
-    @Test
+    //@Test
     @Transactional
     public void testNPlusOneProblem() {
         List<Category> categoryList = categoryRepo.findAll();

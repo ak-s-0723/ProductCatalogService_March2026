@@ -30,3 +30,23 @@ public class SearchController {
                searchRequestDto.getPageNumber());
     }
 }
+
+/*
+
+{
+        "query" : "iphone",
+        "pageSize" : 5,
+        "pageNumber" : 0,
+        "sortParams" : [
+        {
+           "paramName" : "price",
+           "sortOrder" : "HIGH_TO_LOW"
+        },
+        {
+          "paramName" : "id",
+           "sortOrder" : "HIGH_TO_LOW"
+        }
+        ]
+}
+
+        */

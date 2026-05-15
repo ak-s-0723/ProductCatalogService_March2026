@@ -1,5 +1,6 @@
 package org.example.productcatalogservice_march2026.services;
 
+import org.example.productcatalogservice_march2026.dtos.UserDto;
 import org.example.productcatalogservice_march2026.exceptions.ProductAlreadyExistsException;
 import org.example.productcatalogservice_march2026.exceptions.ProductNotFoundException;
 import org.example.productcatalogservice_march2026.models.Product;
@@ -8,6 +9,7 @@ import org.example.productcatalogservice_march2026.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,9 @@ public class StorageProductService implements IProductService {
 
     @Autowired
     private ProductRepo productRepo;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Product getProductById(Long id) {
@@ -69,5 +74,20 @@ public class StorageProductService implements IProductService {
               productRepo.deleteById(id);
             }
         }
+    }
+
+    @Override
+    public Product getProductDetailsBasedOnUserRole(Long productId, Long userId) {
+        Optional<Product> optionalProduct = productRepo.findById(productId);
+        if(optionalProduct.isPresent()) {
+            //check if product is private or public
+            UserDto userDto= restTemplate.getForEntity("http://userservice/users/{userId}", UserDto.class, userId).getBody();
+            if(userDto !=null) {
+                System.out.println(userDto.getEmailId());
+                return optionalProduct.get();
+            }
+        }
+
+        return null;
     }
 }
